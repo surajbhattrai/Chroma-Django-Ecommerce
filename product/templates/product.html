@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load review_extras %}
+
+
+{% block content %}
+
+<div class="container">
+
+    <section class="py-5 container">
+        {% include 'message.html' %}
+
+        <div class="row">
+            <div class="col-md-6 col-12">
+                <div class="row d-flex justify-content-center py-3 sticky-top">
+
+                    <div class="col-12 mb-5 text-center">
+                        <img id="imageBox" src="{{ product.img.url }}" class="w-100"
+                            style="object-fit: contain;height:400px;">
+                    </div>
+
+                    <img class="border rounded mr-3 col-2 gallery-img" type="button" src="{{ product.img.url }}"
+                        style="object-fit: cover;" onclick="myFunction(this)" />
+
+                    {% if product.img_second %}
+                    <img class="border rounded card-hover mr-3 col-2" type="button" src="{{ product.img_second.url }}"
+                        style="object-fit: cover;" onclick="myFunction(this)" />
+                    {% endif %}
+
+                    {% if product.img_third %}
+                    <img class="border rounded card-hover mr-3 col-2" type="button" src="{{ product.img_third.url }}"
+                        style="object-fit: cover;" onclick="myFunction(this)" />
+                    {% endif %}
+
+                    {% if product.img_forth %}
+                    <img class="border rounded card-hover mr-3 col-2" type="button" src="{{ product.img_forth.url }}"
+                        class="active" style="object-fit: cover;" onclick="myFunction(this)" />
+                    {% endif %}
+
+                    {% if product.img_fifth %}
+                    <img class="border rounded card-hover col-2" type="button" src="{{ product.img_fifth.url }}"
+                        class="active" style="object-fit: cover;" onclick="myFunction(this)" />
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-md-6 col-12 pl-md-4 border-left">
+
+                <h1 class="font-weight-semi-bold mb-2">{{product.title}}</h1>
+
+                <span>
+                    {% for i in product.average_review|times %}
+                    <span class="fa fa-star mr-n1 text-warning font-size-xs"></span>
+                    {% endfor %}
+                    <span class="font-weight-semi-bold text-warning align-middle ml-1">{{product.average_review}}</span>
+                    <span class="align-middle font-size-xs font-weight-semi-bold">({{product.total_review}} reviews)</span>
+                </span>
+
+
+                <div class="py-2">
+                    <span class="h2 font-weight-semi-bold text-danger">Rs. {{product.price}}</span>
+                    <del class="font-weight-semi-bold">Rs. {{product.mrp}}</del>
+                </div>
+
+                <div class="row">
+                    <form class="col-lg-7 col-md-12 col-12" action="{% url 'add_to_cart' product.id  %}">
+                        {% csrf_token %}
+
+                        {% if product.product_variation.colors %}
+                        <div class="row my-2">
+                            <div class="col-12">
+                                <h6>Choose Color</h6>
+                            </div>
+                            {% for i in product.product_variation.colors %}
+                            <label class="border py-2 px-3 rounded-lg ml-2" for="{{ i.variation_value }}">
+                                <input type="radio" value="{{ i.variation_value }}" id="{{ i.variation_value }}"
+                                    name="color" {% if forloop.first %}checked{% endif %}>
+                                <label class="pl-1 h4 mb-0" for="{{ i.variation_value }}">
+                                    {{ i.variation_value | capfirst }}
+                                    <span class="icon-shape p-2 rounded-circle"
+                                        style="background-color: {{i.variation_value| lower }};"></span>
+                                </label>
+                            </label>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        {% if product.product_variation.sizes %}
+                        <div class="row my-2">
+                            <div class="col-12">
+                                <h6>Choose Size</h6>
+                            </div>
+                            {% for i in product.product_variation.sizes %}
+                            <label class="border py-2 px-3 rounded-lg ml-2" for="{{ i.variation_value }}">
+                                <input type="radio" value="{{ i.variation_value }}" id="{{ i.variation_value }}"
+                                    name="size" {% if forloop.first %}checked{% endif %}>
+                                <label class="pl-1 mb-0 h4" for="{{ i.variation_value }}">
+                                    {{ i.variation_value | upper }}
+                                </label>
+                            </label>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <h6 class="mb-1">Quantity:</h6>
+                        <div class="row">
+                            <div class="col-xl-3 col-lg-4 col-md-4 col-3">
+                                <input min='1' max="100" required name="quantity" type="number"
+                                    class="form-control bg-light form-control" value="1">
+                            </div>
+                            <div class="col-xl-9 col-lg-8 col-md-8 col-9">
+                                <button type="sumbit" class="btn btn-light-warning btn-block"> <i
+                                        class="fe fe-shopping-cart mr-2 f-16"></i> Add to cart</button>
+                            </div>
+                        </div>
+
+                    </form>
+
+                    {% if saved %}
+                    <div class="col-lg-5 col-md-12 col-12 align-self-end mt-3">
+                        <a href="{% url 'saved_products' %}" class="btn btn-outline-white"><i
+                                class="fe fe-heart mr-2 f-17"></i>Product Saved</a>
+                    </div>
+                    {% else %}
+                    <div class="col-lg-5 col-md-12 col-12 align-self-end mt-3">
+                        <a href="{% url 'wishlist_add' id=product.id %}" class="btn btn-outline-white"><i
+                                class="fe fe-heart mr-2 f-17"></i>Save product for later</a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="card rounded-0 mt-5">
+                    <div class="card-header border-bottom-0 p-0">
+                        <ul class="nav nav-lb-tab" id="tab" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link {% if not request.GET.page %}show active{% endif %}"
+                                    id="description-tab" data-toggle="pill" href="#description">Detail
+                                    Description</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.GET.page %}show active{% endif %} " id="review-tab"
+                                    data-toggle="pill" href="#review">Customer's
+                                    Reviews</a>
+                            </li>
+
+                            {% if product.video %}
+                            <li class="nav-item">
+                                <a class="nav-link" id="video-tab" data-toggle="pill" href="#video">Product
+                                    Video</a>
+                            </li>
+                            {% endif %}
+
+                        </ul>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="tab-content" id="tabContent">
+
+                            <div class="tab-pane fade {% if not request.GET.page %}show active{% endif %}"
+                                id="description">
+                                <div class="mb-4">
+                                    
+                                    {% if product.brand %}
+                                        <span class="text-dark font-weight-semi-bold">Brand : {{product.brand}}</span>
+                                    {% endif %}
+                                    
+                                    {{product.description|safe}}
+
+                                    {{product.specification|safe}}
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade {% if request.GET.page %}show active{% endif %}" id="review">
+
+                                {% comment %} <div class="mb-3">
+                                    <h3 class="mb-4">How people rated this product</h3>
+                                    <div class="row align-items-center">
+                                        <div class="col-auto text-center">
+                                            <h3 class="display-2 font-weight-bold">{{product.average_review}}</h3>
+
+                                            {% for i in product.average_review|times %}
+                                            <span class="fe fe-star mb-2 text-warning font-size-sm"></span>
+                                            {% endfor %}
+
+                                            <p class="mb-0 font-size-xs">(Based on {{product.total_review}} reviews)</p>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                                <hr class="my-5"> {% endcomment %}
+
+                                <div class="mb-3">
+                                    <h3 class="mb-5">Reviews</h3>
+
+                                    {% for review in object_list %}
+
+                                    <div class="media border-bottom pb-4 mb-4">
+                                        <div class="media-body ml-3">
+                                            <h4 class="mb-1">
+                                                {{review.user}}
+                                                <span class="ml-1 font-size-xs text-muted">{{review.created|timesince}}
+                                                    ago</span>
+                                            </h4>
+                                            {% for i in review.stars|times %}
+                                            <span class="fa fa-star mr-n1 mb-2 text-warning font-size-xs"></span>
+                                            {% endfor %}
+
+                                            <p>{{review.content}}</p>
+
+                                            {% for i in review.reply.all %}
+                                            <div class="media mt-3 bg-light rounded-lg p-3">
+                                                <a class="mr-3" href="#">
+                                                    <img src="{{i.user.seller.logo.url}}"
+                                                        class="rounded-circle avatar-md">
+                                                </a>
+                                                <div class="media-body">
+                                                    <h4 class="mb-1">
+                                                        {{i.user.seller.title}}
+                                                        <span
+                                                            class="ml-1 font-size-xs text-muted">{{i.created|timesince}}
+                                                            ago</span>
+                                                    </h4>
+
+                                                    <p class="mb-0 mt-1">{{i.content}}</p>
+
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+
+                                {% include 'pagination.html' %}
+                            </div>
+
+                            <div class="tab-pane fade" id="video">
+
+                                <div>
+                                    <h3 class="mb-3">Product Video</h3>
+                                    {% if product.video %}
+                                    <div class="embed-responsive embed-responsive-16by9">
+                                        <iframe class="embed-responsive-item"
+                                            src="https://www.youtube.com/embed/{{product.get_video_id}}"
+                                            allowfullscreen></iframe>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </section>
+</div>
+
+
+
+<script>
+    function myFunction(smallImg) {
+        var fullImg = document.getElementById("imageBox");
+        fullImg.src = smallImg.src;
+    }
+</script>
+
+
+{% endblock content %}

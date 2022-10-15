@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load templatehelpers %}
+{% load review_extras %}
+
+
+
+{% block content %}
+
+
+<div class="container px-7 pt-5">
+
+    <h1 class="h2 font-weight-bold">Showing results for "{{request.GET.q}}"</h1>
+
+    <div class="row mt-5">
+
+        <div class="container">
+            <h3>What's on your shopping list?</h3>
+            {% if request.GET.list %}
+            <a href="?show=product&q={{request.GET.q}}" class="btn btn-light rounded-pill btn-sm mr-3 mb-3">View all
+                results</a>
+            {% endif %}
+
+            {% for cat in categories %}
+            {% with params=request.GET.urlencode %}
+
+            <a href="{% relative_url cat.slug 'list' params %}"
+                class="btn btn-light rounded-pill btn-sm mr-3 mb-3 {% if request.GET.list == cat.slug %} btn-light-success text-dark-success {% endif %}">
+                {{cat.name}} <i
+                    class="{% if request.GET.list == cat.slug %} fe fe-check text-success {% else %} fe fe-plus text-muted {% endif %} ml-1 font-weight-bold"></i>
+            </a>
+
+            {% endwith %}
+            {% endfor %}
+
+        </div>
+
+        {% for product in products %}
+        <div class="col-md-3 col-6 mt-3">
+            <div class="card mb-4 card-hover">
+                <div class="card-img-top text-center">
+                    <img src="{{product.img.url}}" height="200">
+                </div>
+                <div class="border-top p-3">
+                    <a href="{{product.get_absolute_url}}"
+                        class="text-dark stretched-link">{{product.title|truncatechars:80}}</a>
+
+                    <ul class="mt-1 mb-0 list-inline">
+                        <li class="list-inline-item">
+                            <h3 class="font-weight-semi-bold">Rs. {{product.price}}</h3>
+                        </li>
+
+                        <li class="list-inline-item">
+                            <del class="font-size-sm text-muted">Rs.{{product.mrp}}</del>
+                        </li>
+                    </ul>
+
+                    <div>
+                        {% for i in product.average_review|times %}
+                        <span class="fa fa-star text-warning font-size-xs mr-n1"></span>
+                        {% endfor %}
+                        <span
+                            class="font-weight-semi-bold text-warning pl-1 align-middle">{{product.average_review}}</span>
+
+                        <span class="font-size-xs text-muted align-middle">({{product.total_review}})</span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <nav class="mt-4">
+        {% if products.has_other_pages %}
+        <ul class="pagination justify-content-center">
+            {% if products.has_previous %}
+            <li class="page-item"><a class="page-link"
+                    href="{% relative_url products.previous_page_number 'page' request.GET.urlencode %}">Previous</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><a class="page-link">Previous</a></li>
+            {% endif %}
+            {% for i in products.paginator.page_range %}
+            {% if products.number == i %}
+            <li class="page-item active"><a class="page-link">{{ i }} <a class="sr-only">(current)</a>
+            </li>
+            {% elif  i > products.number|add:'-5' and i < products.number|add:'5' %}
+            <li class="page-item"><a class="page-link"
+                    href="{% relative_url i 'page' request.GET.urlencode %}">{{ i }}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+            {% if products.has_next %}
+            <li class="page-item"><a class="page-link"
+                    href="{% relative_url products.next_page_number 'page' request.GET.urlencode %}">Next</a>
+            </li>
+            {% else %}
+            <li class="disabled page-item"><a class="page-link">Next</a></li>
+            {% endif %}
+        </ul>
+        {% endif %}
+    </nav>
+
+
+</div>
+
+
+{% endblock content %}
+
+{% block footer %}{% endblock %}

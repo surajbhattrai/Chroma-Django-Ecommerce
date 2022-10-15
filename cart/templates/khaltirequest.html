@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+
+
+<div class="bg-light">
+
+    <div class="container d-flex flex-column min-vh-100">
+        <div class="row align-items-center justify-content-center no-gutters pt-15">
+            <div class="col-lg-5 col-md-8">
+                <div class="card shadow card-body p-6 text-center">
+                    <div class=" text-dark-primary rounded mb-3 mx-auto">
+                        <!-- <i class="fe fe-check"></i> -->
+                        <img class="img-4by3-xxl" src="https://www.nepalyp.com/img/np/h/1544347125-73-khalti-digital-wallet.png" alt="">
+                    </div>
+                    <h2 class="mb-1 font-weight-semi-bold">Hey {{user.first_name}},</h2>
+                    <h2 class="mb-1 font-weight-semi-bold">Your order amount is Rs. {{order.total}}.</h2>                    
+
+                    <div class="mt-3">
+                        <button id="payment-button" class="btn btn-light-primary text-dark-primary f-16 py-2 px-5">Pay with Khalti</button>
+                    </div>
+                    <a href="{% url 'cart' %}" class="text-dark font-weight-semi-bold f-13 py-2 px-5"> <i class="fe fe-arrow-left"></i> Go back to cart</a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    var config = {
+
+        "publicKey": "test_public_key_dc74e0fd57cb46cd93832aee0a390234",
+        "productIdentity": "order_{{order.id}}",
+        "productName": "order_{{order.id}}",
+        "productUrl": "http://localhost:8000",
+        "paymentPreference": [
+            "MOBILE_BANKING",
+            "KHALTI",
+            "EBANKING",
+            "CONNECT_IPS",
+            "SCT",
+        ],
+        "eventHandler": {
+            onSuccess(payload) {
+                console.log(payload)                        // khalti le pathayeko payload
+
+                axios.get("/khalti-verify/", {              // axios ko help batw ajax call gareko cha// hamro KhaltiVerifyView view ma get request pathako 
+                    params: {
+                        "token": payload.token,             // payload ma token huncha
+                        "amount": payload.amount,           // payload ma amount huncha
+                        "order_id": "{{order.id}}"
+                    }
+                }).then(function (resp) {                     // yaha response return vai rako huncha
+                    if (resp.data.success == true) {
+                        alert("Thanks. Payment Completed Successfully")
+                        location.href = "/"
+                    }
+                    else {
+                        alert("Sorry. Error occurred")
+                        location.href = "{{request.build_absolute_uri}}"        // yo vaneko redirecting user to the current or same url
+                    }
+                })
+            },
+            onError(error) {
+                console.log(error);
+            },
+            onClose() {
+                console.log('widget is closing');
+            }
+        }
+    };
+
+    var checkout = new KhaltiCheckout(config);
+    var btn = document.getElementById("payment-button");
+    btn.onclick = function () {
+        // minimum transaction amount must be 10 NRs, i.e 1000 in paisa.
+
+        checkout.show({ amount: {{ order.total }} * 100 });
+    }
+</script>
+
+{% endblock %}
+
+{% block footer %}{% endblock footer %}

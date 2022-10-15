@@ -1,0 +1,33 @@
+.DS_STORE
+
+# Byte-compiled / optimized / DLL files
+*.pyc
+__pycache__/
+
+**/migrations/**
+!**/migrations
+!**/migrations/__init__.py
+
+# Virtualenv related
+bin/
+include/
+pip-selfcheck.json
+
+# Django related
+easymart/settings/.env
+easymart/settings/development.py
+
+media/
+staticfiles/
+
+db.sqlite3
+
+
+
+
+
+
+
+
+
+
