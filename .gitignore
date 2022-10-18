@@ -14,12 +14,13 @@ include/
 pip-selfcheck.json
 
 # Django related
-easymart/settings/.env
-easymart/settings/development.py
+chroma/settings/.env
+chroma/settings/development.py
 
 media/
 staticfiles/
 
+codes.py
 db.sqlite3
 
 

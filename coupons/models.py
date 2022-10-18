@@ -54,7 +54,7 @@ class Coupon(models.Model):
     
     @property
     def is_redeemed(self):
-        return self.users.count() >= self.quantity and self.quantity is not 0
+        return self.users.count() >= self.quantity and self.quantity != 0
 
 
 

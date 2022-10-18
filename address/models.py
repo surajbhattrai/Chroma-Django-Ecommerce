@@ -122,12 +122,12 @@ class Address(models.Model):
     #     self.save()
  
 
-def address_post_save_receiver(sender, instance, created, *args, **kwargs):
-    if instance.default:
-        user = instance.user
-        qs = Address.objects.filter(user=user).exclude(id=instance.id)
-        qs.update(default=False)
-        user.cart_user.update_total()
+# def address_post_save_receiver(sender, instance, created, *args, **kwargs):
+#     if instance.default:
+#         user = instance.user
+#         qs = Address.objects.filter(user=user).exclude(id=instance.id)
+#         qs.update(default=False)
+#         user.cart_user.update_total()
 
-post_save.connect(address_post_save_receiver, sender=Address)
+# post_save.connect(address_post_save_receiver, sender=Address)
 

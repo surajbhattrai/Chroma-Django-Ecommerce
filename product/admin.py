@@ -7,14 +7,14 @@ from mptt.admin import DraggableMPTTAdmin
 
 class VariationInline(admin.TabularInline):
     model = Variation
-    extra = 1
+    extra = 1 
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['title','price','mrp','is_active','category','sub_category']
+    list_display = ['title','price','mrp','is_active','img','img_second']
     list_filter = ['published','updated']
     list_per_page = 100
     search_fields = ['title','description']
-    list_editable=['is_active','category','sub_category']
+    list_editable=['is_active','img','img_second']
     inlines = [VariationInline] 
 
 

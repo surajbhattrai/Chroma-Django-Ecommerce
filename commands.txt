@@ -1,0 +1,22 @@
+Create fixtures
+    python manage.py dumpdata > fixtures.json
+____________________________________________
+
+Build docker image 
+    docker-compose build
+
+Run command on docker image
+    docker-compose run --rm <image> python manage.py makemigration .
+
+Start Comtainer
+    docker-compose up
+
+Remove danling images while rebuilding
+    docker build --rm
+
+Interactive Terminal
+    docker exec -it <container_name> /bin/bash
+    docker exec -it django_container /bin/bash
+
+
+

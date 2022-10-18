@@ -4,12 +4,14 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.signals import pre_save, post_save,post_delete
 from helper import unique_code_generator 
-import requests
 from django.utils.safestring import mark_safe
 from django.templatetags.static import static
 from django.dispatch import receiver
 
-
+import requests
+import environ
+env = environ.Env()
+environ.Env.read_env()
  
  
 class UserManager(BaseUserManager):
@@ -95,14 +97,15 @@ class SMSActivation(models.Model):
         return self.save()
     
 
-    # def send_activation(self):
-    #     pass
+    def send_activation(self):
+        pass
 
     def send_activation(self): 
+        token = env("SMS_TOKEN")
         if self.resend < 10:
             if self.code:
                 r = requests.post("http://api.sparrowsms.com/v2/sms",
-                data={'token' : "v2_YDD09SrtAw3RMxNgWzASzerPIJs.JLEX",
+                data={'token' : token,
                   'from'  : 'InfoSMS',
                   'to'    : self.phone,
                   'text'  : self.code + ' is your croma verification Code',})
