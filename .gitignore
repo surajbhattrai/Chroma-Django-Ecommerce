@@ -17,7 +17,6 @@ pip-selfcheck.json
 chroma/settings/.env
 chroma/settings/development.py
 
-media/
 staticfiles/
 
 codes.py
