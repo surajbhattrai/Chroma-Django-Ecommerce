@@ -13,11 +13,16 @@ services:
       - db 
   db:
     image: postgres
+    container_name: postgres_db
     volumes:
       - ./data/db:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=new
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=2000
-    container_name: postgres_db
+    ports:
+      - "5432:5432"
+    networks:
+      app_net:
+        ipv4_address: 192.168.0.2
     

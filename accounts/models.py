@@ -7,12 +7,7 @@ from helper import unique_code_generator
 from django.utils.safestring import mark_safe
 from django.templatetags.static import static
 from django.dispatch import receiver
-
-import requests
-import environ
-env = environ.Env()
-environ.Env.read_env()
- 
+from django.conf import settings  
  
 class UserManager(BaseUserManager):
     use_in_migrations = True
@@ -100,23 +95,23 @@ class SMSActivation(models.Model):
     def send_activation(self):
         pass
 
-    def send_activation(self): 
-        token = env("SMS_TOKEN")
-        if self.resend < 10:
-            if self.code:
-                r = requests.post("http://api.sparrowsms.com/v2/sms",
-                data={'token' : token,
-                  'from'  : 'InfoSMS',
-                  'to'    : self.phone,
-                  'text'  : self.code + ' is your croma verification Code',})
-                status_code = r.status_code
-                response = r.text
-                response_json = r.json()
+    # def send_activation(self): 
+    #     token = settings.SMS_TOKEN
+    #     if self.resend < 10:
+    #         if self.code:
+    #             r = requests.post("http://api.sparrowsms.com/v2/sms",
+    #             data={'token' : token,
+    #               'from'  : 'InfoSMS',
+    #               'to'    : self.phone,
+    #               'text'  : self.code + ' is your croma verification Code',})
+    #             status_code = r.status_code
+    #             response = r.text
+    #             response_json = r.json()
 
-                print(status_code)
-                print(response)
-                print(response_json)
-        return False
+    #             print(status_code)
+    #             print(response)
+    #             print(response_json)
+    #     return False
 
 
 def pre_save_sms_activation_receiver(sender, instance, *args, **kwargs):

@@ -1,9 +1,25 @@
 from pathlib import Path
 import os
+import environ
+env = environ.Env()
+environ.Env.read_env()
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+ 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 MEDIA_DIR = os.path.join(BASE_DIR, 'media')
+SMS_TOKEN = env("SMS_TOKEN")
+
+sentry_sdk.init(dsn=env("SENTRY_SDK"),
+    integrations=[
+        DjangoIntegration(),
+    ],
+    traces_sample_rate=1.0,
+    send_default_pii=True
+)
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -133,3 +149,4 @@ STATICFILES_DIRS = (
 )
 MEDIA_URL = '/media/'
 MEDIA_ROOT = MEDIA_DIR
+
